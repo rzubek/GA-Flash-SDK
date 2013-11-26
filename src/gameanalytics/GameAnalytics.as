@@ -33,12 +33,14 @@ package gameanalytics
 		public static const API_VERSION:String = "1";
 		
 		/**
-		 * Setting DEBUG_MODE to true will cause the Game Analytics wrapper to print additional debug information, such as the status of each submit to the server.
+		 * Setting DEBUG_MODE to true will cause the Game Analytics wrapper to print additional debug information, 
+		 * such as the status of each submit to the server.
 		 */
 		public static var DEBUG_MODE:Boolean = false;
 
 		/**
-		 * When RUN_IN_EDITOR_PLAY_MODE is set to true the Game Analytics wrapper will not submit data to the server while playing the game in the editor.
+		 * When RUN_IN_EDITOR_PLAY_MODE is set to true the Game Analytics wrapper will not submit data 
+		 * to the server while playing the game in the editor.
 		 */
 		public static var RUN_IN_EDITOR_PLAY_MODE:Boolean = false;
 		
@@ -52,7 +54,9 @@ package gameanalytics
 		private static var event_que:Vector.<Array> = new Vector.<Array>();
 		
 		/**
-		 * When a new game is added to your Game Analytics account, you will get a public key and a private key which are unique for that game.
+		 * When a new game is added to your Game Analytics account, you will get a public key and a private key 
+		 * which are unique for that game.
+		 * 
 		 * @param public_key:String - The public key is used directly in the URL for identifying the game.
 		 * @param private_key:String - The private key is used for event authentication.
 		 * @param build:String - Describes the current version of the game being played.
@@ -78,6 +82,7 @@ package gameanalytics
 		
 		/**
 		 * Send a new event to Game Analytics.
+		 * 
 		 * @param category:String - the category of the event. Either user, design, business or quality
 		 * @param ...events - Any number of events to send.
 		 */
@@ -131,21 +136,25 @@ package gameanalytics
 				throw new GameAnalyticsError("There was an error encoding the event as a JSON object. Error: " + e.message);
 			}
 						
+			var authHash :String = MD5.hash(event_json+private_key);
 			request.data = event_json;
 			request.method = URLRequestMethod.POST;
-			request.requestHeaders.push(new URLRequestHeader("Authorization", MD5.hash(event_json+private_key)));
+			request.requestHeaders.push(new URLRequestHeader("Authorization", authHash));
 		
 			var requestor:URLLoader = new URLLoader(); 
 			requestor.addEventListener( Event.COMPLETE, httpRequestComplete ); 
 			requestor.addEventListener( IOErrorEvent.IO_ERROR, httpRequestIOError ); 
 			requestor.addEventListener( SecurityErrorEvent.SECURITY_ERROR, httpRequestSecurityError ); 
+
+			if (DEBUG_MODE) {
+				log("----");
+				log("Sending Game Analytics event:" + (RUN_IN_EDITOR_PLAY_MODE? " (Running in EDITOR PLAY MODE. Not Sending event)": ""));
+				log("\tUrl: " + request.url);
+				log("\tHeader: " + authHash);
+				log("\tData: " + request.data);
+				log("----");
+			}
 			
-			log("----");
-			log("Sending Game Analytics event:" + (RUN_IN_EDITOR_PLAY_MODE? " (Running in EDITOR PLAY MODE. Not Sending event)": ""));
-			log("\tUrl: " + request.url);
-			log("\tHeader: " + MD5.hash(event_json + private_key));
-			log("\tData: " + request.data);
-			log("----");
 			if(!RUN_IN_EDITOR_PLAY_MODE) requestor.load( request ); 
 		} 
 		
