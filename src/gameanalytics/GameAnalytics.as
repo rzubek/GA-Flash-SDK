@@ -1,13 +1,14 @@
 package gameanalytics 
 {
-	import com.adobe.serialization.json.JSON;
 	import com.adobe.crypto.MD5;
-	import flash.errors.IOError;
+	
 	import flash.events.Event;
-	import flash.events.ErrorEvent;
-	import flash.events.IOErrorEvent; 
-	import flash.events.SecurityErrorEvent; 
-	import flash.net.*;
+	import flash.events.IOErrorEvent;
+	import flash.events.SecurityErrorEvent;
+	import flash.net.URLLoader;
+	import flash.net.URLRequest;
+	import flash.net.URLRequestHeader;
+	import flash.net.URLRequestMethod;
 	
 	/**
 	 * ...
@@ -125,7 +126,7 @@ package gameanalytics
 			var request:URLRequest = new URLRequest(URL + "/" + API_VERSION + "/" + public_key + "/" + category);
 			var event_json:String;
 			try{
-				event_json = JSON.encode(events);
+				event_json = JSON.stringify(events);
 			}catch (e:Error) {
 				throw new GameAnalyticsError("There was an error encoding the event as a JSON object. Error: " + e.message);
 			}
