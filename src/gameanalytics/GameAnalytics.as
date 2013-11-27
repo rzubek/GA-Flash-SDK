@@ -16,14 +16,16 @@ package gameanalytics
 	 */
 	public class GameAnalytics 
 	{
+		private static const ALL_EVENT_CATEGORIES :Array = 
+			[ EventCategory.USER, EventCategory.DESIGN, EventCategory.BUSINESS, EventCategory.ERROR ];
 		
-		private static const REQUIRED_FIELDS_USER:Array = ["user_id", "session_id", "build"];
-		private static const REQUIRED_FIELDS_DESIGN:Array = ["user_id", "session_id", "build","event_id"];
-		private static const REQUIRED_FIELDS_BUSINESS:Array = ["user_id", "session_id", "build","event_id","amount","currency"];
-		private static const REQUIRED_FIELDS_QUALITY:Array = ["user_id", "session_id", "build", "event_id"];
+		private static const REQUIRED_FIELDS :Object = {
+			"user": 	["user_id", "session_id", "build"],
+			"design": 	["user_id", "session_id", "build", "event_id"],
+			"business":	["user_id", "session_id", "build", "event_id", "amount", "currency"],
+			"error": 	["user_id", "session_id", "build", "message", "severity"]
+		};		
 		
-		
-		//public static const URL:String = "http://logging.gameanalytics.com";
 		public static const URL:String = "http://api.gameanalytics.com";		
 		public static const PORT:int = 80;
 		
@@ -93,7 +95,10 @@ package gameanalytics
 				return;
 			}
 
-			if(category != EventCategory.USER && category != EventCategory.DESIGN && category != EventCategory.BUSINESS && category != EventCategory.QUALITY) throw new GameAnalyticsError("Event category type '" + category + "' not recognized. Valid types are: " + [EventCategory.USER,EventCategory.DESIGN,EventCategory.BUSINESS,EventCategory.QUALITY]);
+			if (ALL_EVENT_CATEGORIES.indexOf(category) < 0) {
+				throw new GameAnalyticsError("Event category type '" + category + "' not recognized. Valid types are: " + ALL_EVENT_CATEGORIES);
+			}
+			
 			if (events.length == 0) events = [{}];
 			
 			var req_fields:Array = getRequiredFields(category);
@@ -122,11 +127,7 @@ package gameanalytics
 						event[prop] = event[prop].toString();
 					}
 				}
-				
-				
-				
 			}
-
 			
 			var request:URLRequest = new URLRequest(URL + "/" + API_VERSION + "/" + public_key + "/" + category);
 			var event_json:String;
@@ -188,23 +189,12 @@ package gameanalytics
 		 */
 		private static function getRequiredFields(category:String):Array
 		{
-			switch(category) {
-				case EventCategory.USER:
-					return REQUIRED_FIELDS_USER;
-				break;
-				case EventCategory.DESIGN:
-					return REQUIRED_FIELDS_DESIGN;
-				break;
-				case EventCategory.BUSINESS:
-					return REQUIRED_FIELDS_BUSINESS;
-				break;
-				case EventCategory.QUALITY:
-					return REQUIRED_FIELDS_QUALITY;
-				break;
-				default:
-					throw new GameAnalyticsError("No such category: " + category);
-					return [];
-				break;
+			var fields :Array = REQUIRED_FIELDS[category];
+			if (fields != null) {
+				return fields;
+			} else {
+				throw new GameAnalyticsError("No such category: " + category);
+				return [];
 			}
 		}
 		

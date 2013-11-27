@@ -6,12 +6,10 @@ package gameanalytics
 	 */
 	public class EventCategory 
 	{
-		
 		public static var USER:String = "user";
 		public static var DESIGN:String = "design";
 		public static var BUSINESS:String = "business";
-		public static var QUALITY:String = "quality";
-		
+		public static var ERROR:String = "error";
 	}
 
 }
