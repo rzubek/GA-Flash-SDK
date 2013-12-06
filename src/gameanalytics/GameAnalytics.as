@@ -124,7 +124,7 @@ package gameanalytics
 				{
 					var type:String = (typeof event[prop]);
 					if ( type != "string" && type != "number" && type != "boolean"){						
-						event[prop] = event[prop].toString();
+						event[prop] = String(event[prop]);
 					}
 				}
 			}
